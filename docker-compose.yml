@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - SERVER_HOST=0.0.0.0
+      - SERVER_PORT=8080
+      - MONGODB_URI=mongodb://mongo:27017
+      - MONGODB_DATABASE=catchall
+      - DELIVERED_THRESHOLD=1000
+    command: ["-processor", "-workers=8"]
+    depends_on:
+      - mongo
+    restart: unless-stopped
+    networks:
+      - catchall-network
+
+  mongo:
+    image: mongo:6.0
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - catchall-network
+
+  # For larger scale testing and development
+  load-test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: ["go", "test", "-bench=.", "./pkg/eventpool"]
+    networks:
+      - catchall-network
+    profiles:
+      - testing
+
+networks:
+  catchall-network:
+    driver: bridge
+
+volumes:
+  mongo-data:
