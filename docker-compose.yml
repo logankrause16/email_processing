@@ -5,7 +5,7 @@ version: '3.8'
 # 2. mongo: The MongoDB service for data storage.
 # 3. load-test: A service for running load tests against the API.
 
-# The api service is built from the Dockerfile in the current directory and exposes port 8080.
+# The api service is built from the Dockerfile in the current directory and exposes port 8081.
 # It depends on the mongo service, which is built from the official MongoDB image and exposes port 27017.
 # The load-test service is built from the same Dockerfile and runs load tests against the API.
 
@@ -19,10 +19,10 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "8080:8080"
+      - "8081:8081"
     environment:
       - SERVER_HOST=0.0.0.0
-      - SERVER_PORT=8080
+      - SERVER_PORT=8081
       - MONGODB_URI=mongodb://mongo:27017
       - MONGODB_DATABASE=catchall
       - DELIVERED_THRESHOLD=1000

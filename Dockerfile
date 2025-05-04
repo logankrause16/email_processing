@@ -38,7 +38,7 @@ COPY --from=builder /app/catchall .
 COPY --from=builder /app/configs /app/configs
 
 # Expose the application port
-EXPOSE 8080
+EXPOSE 8081
 
 # Set the entrypoint
 ENTRYPOINT ["/app/catchall"]
