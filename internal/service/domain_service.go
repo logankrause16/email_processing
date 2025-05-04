@@ -5,8 +5,8 @@ import (
 	"log"
 	"time"
 
-	"github.com/logankrause16/email_processing/internal/domain"
-	"github.com/logankrause16/email_processing/internal/repository"
+	"email_processing/internal/domain"
+	"email_processing/internal/repository"
 )
 
 // DomainService provides operations for managing domains

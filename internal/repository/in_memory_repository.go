@@ -5,7 +5,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/logankrause16/email_processing/internal/domain"
+	"email_processing/internal/domain"
 )
 
 // InMemoryDomainRepository is an in-memory implementation of DomainRepository

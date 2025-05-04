@@ -2,9 +2,10 @@ package repository
 
 import (
 	"context"
+	"log"
 	"time"
 
-	"github.com/logankrause16/email_processing/internal/domain"
+	"email_processing/internal/domain"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -43,31 +44,33 @@ func NewMongoDomainRepository(ctx context.Context, connectionString string, dbNa
 	db := client.Database(dbName)
 	collection := db.Collection("domains")
 
-	// Create index on domain name for faster lookups (this is already the primary key _id)
-	// Also create an index on status field for queries by status, and updated_at for sorting
+	// Try to create indexes, but don't fail if they already exist with different names
+	// First, drop any existing indexes that might conflict
+	// This is a safe operation during initialization but should be handled carefully in production
+	_, _ = collection.Indexes().DropOne(ctx, "status_index")
+	_, _ = collection.Indexes().DropOne(ctx, "status_regular_index")
+	_, _ = collection.Indexes().DropOne(ctx, "updated_at_index")
+
+	// Create indexes with explicit names
 	_, err = collection.Indexes().CreateMany(
 		ctx,
-		// Create indexex for status, updated_at, and _id
-		// Spoiler alert: (_id is already indexed by default)
-		// This is for the mongo goodies :D
 		[]mongo.IndexModel{
 			{
-				Keys:    bson.D{{"status", 1}}, // Ahhh bson over json, the joys of Go with MongoDB
-				Options: options.Index().SetName("status_regular_index"),
+				Keys:    bson.D{{"status", 1}},
+				Options: options.Index().SetName("status_index_v2"),
 			},
 			{
 				Keys:    bson.D{{"updated_at", -1}},
-				Options: options.Index().SetName("updated_at_index"),
+				Options: options.Index().SetName("updated_at_index_v2"),
 			},
 		},
 	)
+
+	// If index creation fails, log it but continue
 	if err != nil {
-		return nil, err
+		log.Printf("Warning: Failed to create indexes: %v. Continuing anyway.", err)
 	}
 
-	// Return the Mongo Repository instance
-	// This is a good place to log that the connection was successful
-	// and the indexes were created, which can help with debugging
 	return &MongoDomainRepository{
 		client:     client,
 		db:         db,

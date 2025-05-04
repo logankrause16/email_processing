@@ -1,16 +1,10 @@
-package eventpool
+package catchall
 
 import (
 	"fmt"
 	"math/rand"
 	"strings"
 )
-
-/*
-
-Here we are again. Me moving code around like a madman. I think I need to get out more.
-
-*/
 
 const alphaRunes = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
 

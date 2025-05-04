@@ -1,5 +1,18 @@
 version: '3.8'
 
+# This is the docker compose to run this proejct. It is composed of 3 services:
+# 1. api: The main API service that handles incoming requests.
+# 2. mongo: The MongoDB service for data storage.
+# 3. load-test: A service for running load tests against the API.
+
+# The api service is built from the Dockerfile in the current directory and exposes port 8080.
+# It depends on the mongo service, which is built from the official MongoDB image and exposes port 27017.
+# The load-test service is built from the same Dockerfile and runs load tests against the API.
+
+# Just run `docker-compose up` to start all services, or `docker-compose up api` to start only the API service. etc
+
+# if you want to see it spit out some logs while running: `docker-compose up -d` is what you're looking for
+
 services:
   api:
     build:

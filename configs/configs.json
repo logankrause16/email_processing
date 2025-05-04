@@ -1,24 +1,24 @@
 {
-  "server": {
-    "host": "0.0.0.0",
-    "port": 8080,
-    "read_timeout": 5000000000,
-    "write_timeout": 10000000000,
-    "idle_timeout": 120000000000,
-    "shutdown_timeout": 10000000000
-  },
-  "mongodb": {
-    "uri": "mongodb://localhost:27017",
-    "database": "catchall",
-    "collection": "domains",
-    "connect_timeout": 30000000000,
-    "operation_timeout": 5000000000
-  },
-  "metrics": {
-    "enabled": true,
-    "collection_interval": 15000000000
-  },
-  "business": {
-    "delivered_threshold": 1000
+    "server": {
+      "host": "0.0.0.0",
+      "port": 8080,
+      "read_timeout": 5000000000,
+      "write_timeout": 10000000000,
+      "idle_timeout": 120000000000,
+      "shutdown_timeout": 10000000000
+    },
+    "mongodb": {
+      "uri": "mongodb://localhost:27017",
+      "database": "catchall",
+      "collection": "domains",
+      "connect_timeout": 30000000000,
+      "operation_timeout": 5000000000
+    },
+    "metrics": {
+      "enabled": true,
+      "collection_interval": 15000000000
+    },
+    "business": {
+      "delivered_threshold": 1000
+    }
   }
-}

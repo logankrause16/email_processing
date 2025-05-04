@@ -3,6 +3,7 @@ package domain
 import "time"
 
 // DomainStatus represents the possible states of a domain
+// Easy for JSON to serialize and deserialize, and so I don't have to worry about it really.
 type DomainStatus string
 
 const (
@@ -28,6 +29,7 @@ const (
 )
 
 // DomainInfo represents information about a domain
+// This struct is used for both MongoDB and in-memory storage
 type DomainInfo struct {
 	Name           string       `json:"name" bson:"_id"`
 	DeliveredCount int64        `json:"delivered_count" bson:"delivered_count"`
@@ -51,6 +53,6 @@ type ThresholdConfig struct {
 // NewThresholdConfig creates a new ThresholdConfig with default values
 func NewThresholdConfig() ThresholdConfig {
 	return ThresholdConfig{
-		DeliveredThreshold: 1000, // Default threshold as per requirements -> this can be adjusted of course
+		DeliveredThreshold: 1000, // Default threshold as per requirements
 	}
 }

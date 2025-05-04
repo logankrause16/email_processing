@@ -6,9 +6,17 @@ import (
 	"os"
 	"testing"
 
-	"github.com/logankrause16/email_processing/internal/domain"
-	"github.com/logankrause16/email_processing/internal/repository"
+	"email_processing/internal/domain"
+	"email_processing/internal/repository"
 )
+
+/*
+
+I was so shaky on this code. Its like the only bit of testing I did in the whole project.
+
+Apologies for that lol
+
+*/
 
 func TestDomainService_GetDomainStatus(t *testing.T) {
 	// Setup

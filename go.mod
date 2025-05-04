@@ -1,4 +1,4 @@
-module github.com/logankrause16/email_processing
+module email_processing
 
 go 1.21
 

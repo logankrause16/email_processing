@@ -1,4 +1,4 @@
-package eventpool
+package catchall
 
 import (
 	"math/rand"
@@ -6,15 +6,6 @@ import (
 
 	"github.com/mailgun/holster/v3/syncutil"
 )
-
-/*
-
-Addmiteddly, I took your code and threw it else where. I'm kind of a sucker for overcomplication
-of a project. I like to make things more complex than they need to be.
-
-But hey, here we are lol
-
-*/
 
 type Event struct {
 	Type   string `json:"type"`

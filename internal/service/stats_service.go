@@ -5,7 +5,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/logankrause16/email_processing/internal/repository"
+	"email_processing/internal/repository"
 )
 
 // StatsService provides operations for retrieving domain statistics
@@ -32,6 +32,7 @@ type DomainStats struct {
 }
 
 // GetDomainStats gets statistics about domains
+// I want those domain stats. Gimme the context and I will give you the stats
 func (s *StatsService) GetDomainStats(ctx context.Context) (*DomainStats, error) {
 	// Add timeout to context for safety
 	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)

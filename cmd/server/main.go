@@ -12,12 +12,12 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/logankrause16/email_processing/internal/api"
-	"github.com/logankrause16/email_processing/internal/config"
-	"github.com/logankrause16/email_processing/internal/eventprocessor"
-	"github.com/logankrause16/email_processing/internal/repository"
-	"github.com/logankrause16/email_processing/internal/service"
-	"github.com/logankrause16/email_processing/pkg/metrics"
+	"email_processing/internal/api"
+	"email_processing/internal/config"
+	"email_processing/internal/eventprocessor"
+	"email_processing/internal/repository"
+	"email_processing/internal/service"
+	"email_processing/pkg/metrics"
 )
 
 /*

@@ -7,6 +7,10 @@ import (
 	"time"
 )
 
+// Lets hold all those fancy configs in one place. To use everything we need
+// to pass them around like a hot potato. But the potato is a config, and I like
+// sour cream and green onions on my potato. With probably too much cheese and butter.
+
 // Config holds all configuration for the application
 type Config struct {
 	Server   ServerConfig   `json:"server"`
@@ -41,6 +45,8 @@ type MetricsConfig struct {
 }
 
 // BusinessConfig holds business logic configuration
+// Defines # of delivered events required to consider a domain "catch-all"
+// This is a business-specific configuration and can be adjusted as needed, default is 1,000
 type BusinessConfig struct {
 	DeliveredThreshold int64 `json:"delivered_threshold"`
 }

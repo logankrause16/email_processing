@@ -5,7 +5,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/logankrause16/email_processing/internal/domain"
+	"email_processing/internal/domain"
 )
 
 // DomainRepository defines the interface for domain data storage
@@ -78,11 +78,6 @@ func NewDomainRepository(
 ) (DomainRepository, error) {
 	// Apply options with defaults
 	opts := DefaultRepositoryOptions()
-
-	// If options are provided, override defaults
-	// This allows for flexible configuration of the repository
-	// without changing the function signature
-	// and keeps the code clean and easy to read
 	if len(options) > 0 {
 		opts = options[0]
 	}
@@ -91,20 +86,18 @@ func NewDomainRepository(
 	var err error
 
 	// Create base repository
-	// Switch based on the repository type, this allows for easy extension
-	// to support other types of repositories in the future!
+	// This switch statement allows for easy extension in the future
+	// if we want to add more repository types, but this is just a demo so who knows what future Logan wants
 	switch repoType {
+	// Use MongoDB repository if specified
+	// This allows for easy switching between different storage backends
 	case RepositoryTypeMongoDB:
 		logger.Println("Using MongoDB repository")
-		// If we are using MongoDB, we create a new MongoDomainRepository
-		// pass it the context, mongoURI and dbName then establish it as the base repo.
 		baseRepo, err = NewMongoDomainRepository(ctx, mongoURI, dbName)
 		if err != nil {
 			return nil, err
 		}
 	default:
-		// Default to in-memory repository.
-		// Complete with mutex for thread safety
 		logger.Println("Using in-memory repository")
 		baseRepo = NewInMemoryDomainRepository()
 	}

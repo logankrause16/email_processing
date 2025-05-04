@@ -5,9 +5,10 @@ import (
 	"log"
 	"net/http"
 
+	"email_processing/internal/domain"
+	"email_processing/internal/service"
+
 	"github.com/go-chi/chi/v5"
-	"github.com/logankrause16/email_processing/internal/domain"
-	"github.com/logankrause16/email_processing/internal/service"
 )
 
 // DomainHandler handles HTTP requests related to domains

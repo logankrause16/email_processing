@@ -3,8 +3,18 @@ package eventpool_test
 import (
 	"testing"
 
-	"github.com/logankrause16/email_processing/pkg/eventpool"
+	"email_processing/pkg/eventpool"
 )
+
+/*
+
+I did football in middle school.
+
+Kind of.
+
+I was a bench warmer.
+
+*/
 
 func BenchmarkEventBus(b *testing.B) {
 	bus := eventpool.SpawnEventPool()

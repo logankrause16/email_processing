@@ -6,12 +6,23 @@ import (
 	"sync"
 	"time"
 
-	"github.com/logankrause16/email_processing/internal/domain"
-	"github.com/logankrause16/email_processing/internal/repository"
-	"github.com/logankrause16/email_processing/internal/service"
-	"github.com/logankrause16/email_processing/pkg/eventpool"
-	"github.com/logankrause16/email_processing/pkg/metrics"
+	"email_processing/internal/domain"
+	"email_processing/internal/repository"
+	"email_processing/internal/service"
+	"email_processing/pkg/eventpool"
+	"email_processing/pkg/metrics"
 )
+
+/*
+
+Ahh batch processing. That cruel mistress of large data. What's the correct batch size? Is my
+offset correct? Is my batch size too large? Did I turn off the oven? Is the garage door closed?
+Should I have done the dishes before bed?
+
+Batch processing is super common and efficient! Combine it with the speed of Go and a nosql database
+like Mongo and you have the Flash. Specifically Wally West. Not Barry Allen. Wally West is the fastest.
+
+*/
 
 // BatchEventProcessor handles processing events in batches from the EventPool
 type BatchEventProcessor struct {
@@ -48,6 +59,8 @@ func NewBatchEventProcessor(
 }
 
 // Start begins processing events in batches
+// This is a mess. I spent too long on it and needed to move on.
+// but hey, it works! So lets chop up some batches and process them
 func (p *BatchEventProcessor) Start() {
 	p.logger.Println("Starting batch event processor...")
 
@@ -105,21 +118,35 @@ func (p *BatchEventProcessor) Stop() {
 }
 
 // batchWorker processes events in batches
+// This function is responsible for processing events in batches and recycling them
+// after processing. It handles the logic of converting events to batches,
+// processing the batches, and recycling the events back to the pool.
+// But was also a pain to write and is a bit of a mess, so do with it was you will.
+// I spent too long on it and needed to move on.
 func (p *BatchEventProcessor) batchWorker(id int, eventCh <-chan *eventpool.Event) {
 	defer p.wg.Done()
 
 	p.logger.Printf("Batch worker %d started", id)
 
-	// Batch processing state
+	// Lets initialize our EventBatch
 	batch := make([]repository.EventBatch, 0, p.batchSize)
+
+	// This map will hold the event counts for each domain and event type
 	eventMap := make(map[string]map[domain.EventType]int)
+
+	// This slice will hold events to be recycled after processing
+	// This is a cool hacky solution I found. I think it saved a bit of memory?
 	recycleQueue := make([]*eventpool.Event, 0, p.batchSize)
 
 	// Timer for periodic flushing
+	// Shitters full
 	flushTimer := time.NewTimer(p.flushInterval)
+
 	defer flushTimer.Stop()
 
 	// Process and clear current batch
+
+	// This is where the work happens.
 	processEvents := func() {
 		if len(eventMap) == 0 {
 			return
@@ -129,6 +156,8 @@ func (p *BatchEventProcessor) batchWorker(id int, eventCh <-chan *eventpool.Even
 
 		// Convert map to batch
 		batch = batch[:0] // Clear slice but reuse capacity
+		// Nested for loop? What am I, a monster? Yeah probably. This is the weakest bit of the code
+		// by far but hey, make it work the first time, then make it righ the second.
 		for domainName, events := range eventMap {
 			for eventType, count := range events {
 				batch = append(batch, repository.EventBatch{
@@ -140,6 +169,7 @@ func (p *BatchEventProcessor) batchWorker(id int, eventCh <-chan *eventpool.Even
 		}
 
 		// Process batch
+		// Lets keep working with the context and time it takes.
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		err := p.batchRepo.IncrementEventCountBatch(ctx, batch)
 		cancel()

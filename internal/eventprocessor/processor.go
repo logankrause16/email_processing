@@ -6,10 +6,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/logankrause16/email_processing/internal/domain"
-	"github.com/logankrause16/email_processing/internal/service"
-	"github.com/logankrause16/email_processing/pkg/eventpool"
-	"github.com/logankrause16/email_processing/pkg/metrics"
+	"email_processing/internal/domain"
+	"email_processing/internal/service"
+	"email_processing/pkg/eventpool"
+	"email_processing/pkg/metrics"
 )
 
 // Processor defines the interface for event processors
@@ -56,8 +56,6 @@ func (p *EventProcessor) Start() {
 	p.pool = eventpool.SpawnEventPool()
 
 	// Start worker goroutines
-	// Worker goroutines: These are the threads that will process events concurrently.
-	// Each worker will pull events from the pool and process them.
 	for i := 0; i < p.workerCount; i++ {
 		p.wg.Add(1)
 		go p.worker(i)
@@ -76,6 +74,7 @@ func (p *EventProcessor) Stop() {
 }
 
 // worker processes events in a loop
+// Employ a worker, pay him fairly and then recycle him. Soylent Green is people!
 func (p *EventProcessor) worker(id int) {
 	defer p.wg.Done()
 
@@ -100,6 +99,10 @@ func (p *EventProcessor) worker(id int) {
 }
 
 // processEvent handles a single event
+// Lets find out what the event is and get it to where it needs to go.
+// But we also need to be away of the context and the time it takes to process the event.
+// I didn't really know what that time should be, so I just made it 5 seconds.
+// Not sure if thats too long or too short, but had to keep moving!
 func (p *EventProcessor) processEvent(event *eventpool.Event) {
 	start := time.Now()
 

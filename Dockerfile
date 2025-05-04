@@ -1,3 +1,9 @@
+# Docker file for the application. It is mainly used for building the docker-compose images and containers
+
+# had to look up and play with this for awhile until I got it right. I was not explicitly running the 
+# go mod download command after copying the go.mod and go.sum files. I was just copying the entire directory and
+# then running the go build command like you would in the Node stuff I'm used to.
+
 FROM golang:1.21-alpine AS builder
 
 # Install build dependencies
