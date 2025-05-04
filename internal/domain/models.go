@@ -51,6 +51,6 @@ type ThresholdConfig struct {
 // NewThresholdConfig creates a new ThresholdConfig with default values
 func NewThresholdConfig() ThresholdConfig {
 	return ThresholdConfig{
-		DeliveredThreshold: 1000, // Default threshold as per requirements
+		DeliveredThreshold: 1000, // Default threshold as per requirements -> this can be adjusted of course
 	}
 }

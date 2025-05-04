@@ -112,6 +112,8 @@ func (c *CachedDomainRepository) UpdateDomainStatus(ctx context.Context, domainN
 }
 
 // GetCacheStats returns current cache statistics
+// The whole cacheing system was a nightmare to work with. I used Claude heavily for this section
+// to ensure it was correct and done in a timely manner. Sorry if this wasn't allowed.
 func (c *CachedDomainRepository) GetCacheStats() (hits, misses uint64) {
 	c.stats.mutex.RLock()
 	defer c.stats.mutex.RUnlock()
@@ -129,7 +131,9 @@ func (c *CachedDomainRepository) startCleanup() {
 }
 
 // cleanup removes expired items from cache
+// This method is called periodically by the cleanup goroutine
 func (c *CachedDomainRepository) cleanup() {
+	// This cleanup function was written by Claude. Assisted to ensure it is correct.
 	now := time.Now()
 	var count int
 

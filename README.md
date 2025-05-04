@@ -1,37 +1,153 @@
-# catchall-assessment
+# Email Processing Service
+A high-performance, scalable service for detecting catch-all email domains by analyzing email delivery events.
 
-## Introduction 
-Everyday at Mailgun we build and maintain systems at scale. For example our email delivery system generates various types of events that describe the various statuses of an email as it passes through our system. At last count we produce around 200k of these events every second, with this number growing by about 60% every year. Many of the services we build must be designed to handle the current level of traffic and be built to scale into the future. To help give you a taste for this scale and to understand your skills in this area, We would like to invite you to design and code a highly scalable event processing system.
+# Overview
+This service processes and analyzes email delivery events at scale to determine whether a domain is a "catch-all" domain (one that accepts all incoming email). The determination is made based on specific business rules:
 
-## Catch-all Domain
-A Catch-all domain is a domain name that ensures no email to the domain is rejected or lost. With a catch-all domain, you could tell people to send email to anything at your designated domain such as: devs@example.com, info@example.com, foo@example, or younameit@example.com. No matter what they entered in front of the @ sign, email sent to this address will never bounce or get rejected. Though useful for those concerned about potentially missing important messages due to typos in the mailbox, spammers take advantage of them, as they do not need to hunt for usernames, guess mailbox names, or scrape email addresses. They simply put whatever they want in front of the domain and send their messages — and those messages arrive as intended. As a result, catch-all domains tend to get flooded with spam and become unusable.
+A domain is considered a catch-all when it receives more than 1000 delivered emails and has no bounced emails
+A domain is considered not a catch-all when it receives at least 1 bounced email
+A domain is considered unknown when it has fewer than 1000 delivered emails and no bounces
+## Architecture
+The system is built using Go's clean architecture principles with clear separation of concerns:
 
-## Challenge 
-Your code challenge, should you choose to accept it, is to build a distributed system that identifies these catch-all domains by counting delivered and bounced events (https://en.wikipedia.org/wiki/Bounce_message) provided to your application through the following endpoints:
+## Core Components
+Domain Layer (internal/domain)
+Defines core business models and rules
+Contains domain entities and value objects
+Defines business-specific constants and thresholds
+Repository Layer (internal/repository)
+Abstracts data storage using the repository pattern
+Supports both MongoDB and in-memory implementations
+Includes optional caching with background cache cleanup
+Service Layer (internal/service)
+Implements core business logic
+Applies rules for determining domain status
+Coordinates between repository and API layers
+API Layer (internal/api)
+Exposes RESTful API endpoints
+Handles HTTP requests and responses
+Implements routing using the Chi router
+Event Processing (internal/eventprocessor)
+Processes events using worker pools
+Supports batch processing for higher throughput
+Manages event lifecycle with recycling
+Metrics Collection (pkg/metrics)
+Collects performance metrics
+Tracks event counts and response times
+Provides statistics for monitoring
+Technical Highlights
+Concurrency: Uses Go's goroutines and channels for parallelism
+Caching: Implements TTL-based caching with background cleanup
+Batch Processing: Processes events in batches for efficiency
+MongoDB Integration: Optimized for high-throughput operations
+Graceful Shutdown: Proper resource cleanup on termination
+API Endpoints
+The service exposes these main endpoints:
 
-- PUT /events/<domain_name>/delivered - receives an event of type “delivered”. 
-- PUT /events/<domain_name>/bounced - receives an event of type “bounced”.
+`PUT /events/<domain_name>/delivered - Records a delivered email event`
+`PUT /events/<domain_name>/bounced - Records a bounced email event`
+`GET /domains/<domain_name> - Gets the status of a domain (catch-all/not-catch-all/unknown)`
+`GET /domains/stats - Gets statistics about domains in the system`
+`GET /metrics - Gets performance metrics of the service`
 
-For this challenge the testing events can be generated using the provided code in this repository.
+## Configuration
+The service can be configured in multiple ways:
 
-A domain name can be considered a catch-all when it receives more than 1000 “delivered” events. If a domain name receives less than 1000 “delivered” events it’s considered “unknown” as there’s not enough data to make a determination. A domain name is not a catch-all when it receives at least 1 “bounced” event. The customers should be able to use the following API to query the status of a domain name:
+Default Configuration: Sensible defaults for development
+Configuration File: JSON file with custom settings
+Environment Variables: Override settings via environment
+Command-line Flags: Runtime options for flexibility
+Configuration Options
+Server: Host, port, timeouts
+MongoDB: Connection URI, database name, timeouts
+Metrics: Collection interval, enabled flag
+Business: Delivered threshold for catch-all detection
+Performance Optimizations
+The service includes several optimizations for high-throughput processing:
 
-- GET /domains/<domain_name> - returns whether a domain name is catch-all / not catch-all / unknown.
+### MongoDB Optimizations:
+Atomic operations for counters
+Efficient indexing strategy
+Bulk operations for batch processing
+Connection pooling for resource efficiency
+Memory Optimizations:
+Object pooling to reduce allocations
+TTL-based caching for hot data
+Batch processing to reduce overhead
+Background cleanup to manage memory
+Concurrency Optimizations:
+Worker pools for parallel processing
+Non-blocking operations where possible
+Thread-safe data structures
+Context-based timeout management
+Running the Service
+Prerequisites
+Go 1.21+
+MongoDB (optional, for production use)
+Starting the Service
+bash
+# Run with in-memory storage (for development)
+go run cmd/server/main.go
 
-The service should have a fault tolerant architecture that is able to scale to handle 100,000 events per second across 10,000,000 different domain names with P95 latency of 200ms. It’s important to note that your solution doesn’t have to work at that scale, it merely has to have the architecture capable of doing so. We will accept architectures capable of smaller scale with supporting documentation outlining the thoughts on how to improve it.
+# Run with MongoDB
+go run cmd/server/main.go -mongodb
 
-We're looking for the service to be written in Go. Feel free to bring libraries and frameworks, ideally lightweight ones. No need for over-engineering, we just need to see you get the basics right, we can iterate as we go along.
+# Run with all optimizations
+go run cmd/server/main.go -mongodb -cache -processor -workers=16
+Command-line Options
+-config=<path>: Path to configuration file
+-mongodb: Use MongoDB for storage (instead of in-memory)
+-cache: Enable in-memory caching layer
+-cache-ttl=<duration>: Set cache TTL (default: 5m)
+-processor: Enable background event processor
+-workers=<count>: Set worker count (default: CPU count)
+Development
+Project Structure
+email_processing/
+├── cmd/                      # Entry points
+│   ├── server/               # Main application
+│   ├── loadtest/             # Load testing tool
+│   └── mongobatchtest/       # MongoDB batch testing
+├── internal/                 # Private application code
+│   ├── api/                  # HTTP API handlers
+│   ├── config/               # Configuration management
+│   ├── domain/               # Domain models
+│   ├── eventprocessor/       # Event processing
+│   ├── repository/           # Data access layer
+│   └── service/              # Business logic
+├── pkg/                      # Public packages
+│   ├── eventpool/            # Event generation
+│   └── metrics/              # Metrics collection
+└── scripts/                  # Utility scripts
+Testing
+bash
+# Run all tests
+go test ./...
 
-## App Requirements 
-- Being able to be deployed on multiple nodes and scaled horizontally.
-- One of the following databases should be used: MongoDB, Cassandra, Clickhouse.
-- Code Requirements Close-to-production quality code, whatever this means to you (unit-tests), however no need to create a deployment process.
-- During the code review you are free to make code changes in response to feedback.
+# Run performance tests
+go run cmd/loadtest/main.go -events=10000 -concurrency=8
 
-## Bonus Points 
-Anything you think would make this application better.
+# Run MongoDB batch tests
+go run cmd/mongobatchtest/main.go
+Design Decisions
+This project demonstrates several key Go patterns and best practices:
 
-## Timeline 
-Please have this excise done within a week of recieving it. If you need more time or have questions please don't hesitate to reach out.
+Interface-based design for flexibility and testability
+Repository pattern for data storage abstraction
+Dependency injection for loose coupling
+Context usage for timeout and cancellation
+Graceful shutdown for proper resource cleanup
+Worker pool pattern for concurrent processing
+Decorator pattern for adding caching functionality
+Options pattern for flexible configuration
+Scalability
+The service is designed to scale to handle high traffic:
 
-Thanks!
+Horizontal scaling through stateless design
+MongoDB sharding support for data distribution
+Efficient use of resources through batch processing
+Caching to reduce database load
+Configurable worker counts for CPU utilization
+License
+This project is proprietary and confidential.
+

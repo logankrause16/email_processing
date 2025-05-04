@@ -56,6 +56,8 @@ func (p *EventProcessor) Start() {
 	p.pool = eventpool.SpawnEventPool()
 
 	// Start worker goroutines
+	// Worker goroutines: These are the threads that will process events concurrently.
+	// Each worker will pull events from the pool and process them.
 	for i := 0; i < p.workerCount; i++ {
 		p.wg.Add(1)
 		go p.worker(i)

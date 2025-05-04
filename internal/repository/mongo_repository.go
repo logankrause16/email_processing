@@ -44,12 +44,15 @@ func NewMongoDomainRepository(ctx context.Context, connectionString string, dbNa
 	collection := db.Collection("domains")
 
 	// Create index on domain name for faster lookups (this is already the primary key _id)
-	// Also create an index on status field for queries by status
+	// Also create an index on status field for queries by status, and updated_at for sorting
 	_, err = collection.Indexes().CreateMany(
 		ctx,
+		// Create indexex for status, updated_at, and _id
+		// Spoiler alert: (_id is already indexed by default)
+		// This is for the mongo goodies :D
 		[]mongo.IndexModel{
 			{
-				Keys:    bson.D{{"status", 1}},
+				Keys:    bson.D{{"status", 1}}, // Ahhh bson over json, the joys of Go with MongoDB
 				Options: options.Index().SetName("status_regular_index"),
 			},
 			{
@@ -62,6 +65,9 @@ func NewMongoDomainRepository(ctx context.Context, connectionString string, dbNa
 		return nil, err
 	}
 
+	// Return the Mongo Repository instance
+	// This is a good place to log that the connection was successful
+	// and the indexes were created, which can help with debugging
 	return &MongoDomainRepository{
 		client:     client,
 		db:         db,
