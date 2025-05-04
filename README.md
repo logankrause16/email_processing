@@ -44,11 +44,13 @@ Graceful Shutdown: Proper resource cleanup on termination
 API Endpoints
 The service exposes these main endpoints:
 
+```
 `PUT /events/<domain_name>/delivered - Records a delivered email event`
 `PUT /events/<domain_name>/bounced - Records a bounced email event`
 `GET /domains/<domain_name> - Gets the status of a domain (catch-all/not-catch-all/unknown)`
 `GET /domains/stats - Gets statistics about domains in the system`
 `GET /metrics - Gets performance metrics of the service`
+```
 
 ## Configuration
 The service can be configured in multiple ways:
@@ -103,6 +105,8 @@ Command-line Options
 -workers=<count>: Set worker count (default: CPU count)
 Development
 Project Structure
+
+```
 email_processing/
 ├── cmd/                      # Entry points
 │   ├── server/               # Main application
@@ -119,6 +123,8 @@ email_processing/
 │   ├── eventpool/            # Event generation
 │   └── metrics/              # Metrics collection
 └── scripts/                  # Utility scripts
+```
+
 Testing
 bash
 # Run all tests
